@@ -53,8 +53,7 @@ public class ProductDAO {
 		Transaction trans = session.beginTransaction();
 		
 		try {
-			Product entity = (Product)session.load(Product.class, id);
-			
+			Product entity = (Product)session.load(Product.class, id);			
 			session.delete(entity);
 			trans.commit();
 		} catch (Exception e) {
@@ -152,4 +151,21 @@ public class ProductDAO {
 		}
 		return list;
 	}
+	
+	public Product updateQuantity(int id,int quantity) {
+		Session session  = Utils.getSessionFactory().openSession();
+		Transaction trans = session.beginTransaction();
+		try {
+			String hql = "UPDATE Product SET Quantity=:quantity WHERE ProductId=:id";
+			Query query = session.createQuery(hql).setParameter("quantity", quantity).setParameter("id", id);
+			query.executeUpdate();
+			trans.commit();
+		} catch (Exception e) {
+			e.printStackTrace();
+			trans.rollback();
+			throw e;
+		}
+		return null;
+	}
+	
 }

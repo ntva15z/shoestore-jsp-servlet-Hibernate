@@ -14,9 +14,11 @@ import javax.servlet.http.HttpSession;
 
 import com.myweb.shoptuti.HibernateDAO.CartDAO;
 import com.myweb.shoptuti.HibernateDAO.CartDetailDAO;
+import com.myweb.shoptuti.HibernateDAO.ProductDAO;
 import com.myweb.shoptuti.HibernateEntity.Cart;
 import com.myweb.shoptuti.HibernateEntity.CartDetail;
 import com.myweb.shoptuti.HibernateEntity.Customers;
+import com.myweb.shoptuti.HibernateEntity.Product;
 
 /**
  * Servlet implementation class ShoppingCartController
@@ -42,14 +44,21 @@ public class CheckOut extends HttpServlet {
 				CartDAO cartdao = new CartDAO();
 				cartdao.insert(cart);
 				for (int i = 0; i < listcartdetail.size(); i++) {
+					ProductDAO prodao = new ProductDAO();
 					CartDetail cartDetail = new CartDetail();
 					cartDetail.setCart(cart);
 					cartDetail.setPrice(listcartdetail.get(i).getPrice());
 					cartDetail.setQuantity(listcartdetail.get(i).getQuantity());
 					cartDetail.setProduct(listcartdetail.get(i).getProduct());
+					//update số lượng tồn kho
+					Product product = prodao.findProductById(listcartdetail.get(i).getProduct().getProductId());
+					int soluong = product.getQuantity()-listcartdetail.get(i).getQuantity();
+					prodao.updateQuantity(listcartdetail.get(i).getProduct().getProductId(), soluong);
+					//insert cart detail
 					CartDetailDAO detaildao = new CartDetailDAO();
 					detaildao.insert(cartDetail);
 				}
+				
 				session.removeAttribute("cart");
 				session.removeAttribute("total");
 				session.removeAttribute("sl");
